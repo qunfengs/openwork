@@ -183,10 +183,11 @@ Recommended translation review loop:
 
 1. Sync `dev` from `upstream/dev`
 2. Update `zh-cn-l10n`
-3. Diff English and Chinese locale keys
-4. Translate missing or stale keys
-5. Build the desktop app and verify Chinese UI paths manually
-6. Commit only source translation changes
+3. Run `corepack pnpm --filter @openwork/app test:i18n` to detect newly added or still-missing Chinese locale keys
+4. Diff English and Chinese locale keys when the check reports gaps
+5. Translate missing or stale keys
+6. Build the desktop app and verify Chinese UI paths manually
+7. Commit only source translation changes
 
 ## App Architecture (CUPID)
 
