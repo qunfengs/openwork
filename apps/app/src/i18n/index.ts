@@ -1,7 +1,8 @@
 import { createSignal, createRoot } from "solid-js";
 import en from "./locales/en";
 import ja from "./locales/ja";
-import zh from "./locales/zh";
+import zhBase from "./locales/zh";
+import zhCustom from "./locales/zh.custom";
 import vi from "./locales/vi";
 import ptBR from "./locales/pt-BR";
 import th from "./locales/th";
@@ -33,12 +34,17 @@ export const LANGUAGE_OPTIONS = [
 /**
  * Translation maps
  */
+const zh = {
+  ...zhBase,
+  ...zhCustom,
+};
+
 const TRANSLATIONS: Record<Language, Record<string, string>> = {
   en,
   ja,
   zh,
   vi,
-    "pt-BR": ptBR,
+  "pt-BR": ptBR,
   th,
 };
 
