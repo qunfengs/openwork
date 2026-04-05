@@ -85,6 +85,15 @@ export const setLocale = (newLocale: Language) => {
   }
 };
 
+const readBuildDefaultLocale = (): Language => {
+  const envValue =
+    typeof import.meta !== "undefined"
+      ? (import.meta.env as Record<string, unknown> | undefined)?.VITE_OPENWORK_DEFAULT_LOCALE
+      : undefined;
+
+  return isLanguage(envValue) ? envValue : "en";
+};
+
 /**
  * Translation function with fallback behavior
  * Fallback chain: target language → English → key itself
@@ -123,8 +132,10 @@ export const t = (key: string, localeOverride?: Language, params?: Record<string
  * Call this during app initialization
  */
 export const initLocale = (): Language => {
+  const buildDefaultLocale = readBuildDefaultLocale();
+
   if (typeof window === "undefined") {
-    return "en";
+    return buildDefaultLocale;
   }
 
   try {
@@ -141,8 +152,9 @@ export const initLocale = (): Language => {
   }
 
   if (typeof document !== "undefined") {
-    document.documentElement.setAttribute("lang", "en");
+    document.documentElement.setAttribute("lang", buildDefaultLocale);
   }
 
-  return "en";
+  setLocaleSignal(buildDefaultLocale);
+  return buildDefaultLocale;
 };

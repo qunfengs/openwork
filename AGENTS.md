@@ -130,6 +130,64 @@ Design principles for hot reload:
 * Use `DESIGN-LANGUAGE.md` as the default visual reference for OpenWork app and landing work.
 * For OpenWork session-surface details, also reference `packages/docs/orbita-layout-style.mdx`.
 
+## Fork + Localization Maintenance Workflow
+
+For long-lived translation or regional customization work, do not maintain directly on the upstream repository clone. Use a fork-based workflow so upstream updates remain easy to merge.
+
+Required remote layout:
+
+* `origin`: your own GitHub fork
+* `upstream`: `https://github.com/different-ai/openwork.git`
+
+Required branch strategy:
+
+* `dev`: local mirror of `upstream/dev`; keep this branch clean and as close to upstream as possible
+* `zh-cn-l10n` (or another clearly named customization branch): your ongoing Simplified Chinese localization work
+
+Recommended initial setup:
+
+* `git clone https://github.com/<your-account>/openwork.git`
+* `git remote add upstream https://github.com/different-ai/openwork.git`
+* `git fetch upstream`
+* `git checkout -B dev upstream/dev`
+* `git push -u origin dev`
+* `git checkout -b zh-cn-l10n`
+* `git push -u origin zh-cn-l10n`
+
+Required upstream sync flow:
+
+1. `git fetch upstream`
+2. `git checkout dev`
+3. `git merge --ff-only upstream/dev`
+4. `git push origin dev`
+5. `git checkout zh-cn-l10n`
+6. Merge or rebase `dev` into the localization branch
+7. `git push origin zh-cn-l10n`
+
+Merge policy:
+
+* Prefer `merge dev` for safer day-to-day maintenance when multiple people may touch the branch.
+* Prefer `rebase dev` only when the branch owner explicitly wants a linear history and understands force-push requirements.
+* Never rewrite `dev` away from upstream history.
+
+Localization maintenance rules:
+
+* Treat upstream locale files as vendor-owned. Keep upstream improvements whenever possible.
+* Prefer maintaining project-owned Chinese overrides in a small overlay file rather than rewriting the full upstream locale file every time.
+* Keep Chinese translation work scoped to source files under `apps/app/src/i18n/**` unless a string is hardcoded outside the i18n system.
+* If UI text is still English, first determine whether the key is missing from the Chinese locale or whether the UI is bypassing `t(...)`.
+* When upstream adds new English keys, translate only the new or changed keys instead of reworking the full locale file.
+* Do not commit generated build output or packaging artifacts as part of translation-only work.
+
+Recommended translation review loop:
+
+1. Sync `dev` from `upstream/dev`
+2. Update `zh-cn-l10n`
+3. Diff English and Chinese locale keys
+4. Translate missing or stale keys
+5. Build the desktop app and verify Chinese UI paths manually
+6. Commit only source translation changes
+
 ## App Architecture (CUPID)
 
 For `apps/app/src/app/**`, use CUPID: small public surfaces, intention-revealing names, minimal dependencies, predictable ownership, and domain-based structure.
